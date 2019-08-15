@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <header>Relative Laser Brightness Calculator</header>
+    <div class="main-container">
+        <div class="laser-container">
+            <div class="outer-display">
+                <div id="laser1" class="laser-display">
+                    <p id="text1"></p>
+                </div>
+            </div>
+            <div>
+                <h1>Laser 1</h1>
+                <input id="power1" type="number" value="5" name="power1">
+                <label for="power1">mw</label>
+                <input id="input1" type="number" value="532" name="wave1">
+                <label for="wave1">nm</label>
+            </div>
+        </div>
+        <div class="laser-container">
+            <div class="outer-display">
+                <div id="laser2" class="laser-display">
+                    <p id="text2"></p>
+                </div>
+            </div>
+            <div>
+                <h1>Laser 2</h1>
+                <input id="power2" type="number" value="5" name="power2">
+                <label for="power2">mw</label>
+                <input id="input2" type="number" value="450" name="wave2">
+                <label for="wave2">nm</label>
+            </div>
+        </div>
+    </div>
+    <input type="checkbox" name="beambox" id="beam-box">
+    <label for="beam-box">Beam brightness</label>
+    <script src="./index.js" />
+    <script>console.log("test");</script>
+    </body>
+
+</html>

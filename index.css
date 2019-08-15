@@ -1,0 +1,81 @@
+* {
+    box-sizing: border-box;
+    margin: 0px;
+}
+
+header {
+    text-align: center;
+    background-color: rgb(70, 70, 70);
+    color: white;
+    margin: 0;
+    padding: 5px;
+    font-size: 1.2rem;
+}
+
+body {
+    background-color: rgb(232, 240, 239);
+    text-align: center;
+}
+
+h1 {
+    display: inline;
+    font-size: 1rem;
+    margin: 5px 0px 5px 5px;
+}
+
+label {
+    margin: 5px 5px 5px 0px;
+}
+
+.main-container {
+    margin: auto;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.laser-container {
+    display: inline-block;
+    height: 200px;
+    border: 1px solid rgb(17, 17, 53);
+    border-radius: 4px;
+    background-color: white;
+    margin: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-shadow: 3px 5px 5px darkgray;
+    overflow: hidden;
+}
+
+p {
+    display: inline-block;
+    position: absolute;
+    bottom: 5px;
+    text-shadow: 0px 0px 5px white;
+}
+
+input {
+    width: 100px;
+    margin: 5px 0px;
+}
+
+.laser-display {
+    position: relative;
+    text-align: center;
+}
+
+body>input, body>label {
+    width: auto;
+    text-align: center;
+}
+
+.outer-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
