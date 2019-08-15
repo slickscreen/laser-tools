@@ -61,7 +61,7 @@ label {
     position: absolute;
     bottom: 5px;
     text-shadow: 0px 0px 5px white;
-    right: calc(50% - (75px / 2) - 3px);
+    right: calc(50% - (90px / 2) - 3px);
     border: 1px lightgray solid;
     border-radius: 3px;
     background-color: rgba(255, 255, 255, 0.781);
@@ -69,7 +69,7 @@ label {
 }
 
 input {
-    width: 75px;
+    width: 90px;
     margin: 5px 0px;
 }
 
