@@ -483,8 +483,12 @@ function updateVals() {
     let laserWave1 = Number(input1.value);
     let laserWave2 = Number(input2.value);
 
-    laser1.style.backgroundColor = wavelengthToColor(laserWave1)[0];
-    laser2.style.backgroundColor = wavelengthToColor(laserWave2)[0];
+    const color1 = wavelengthToColor(laserWave1)[0];
+    const color2 = wavelengthToColor(laserWave2)[0];
+    laser1.style.backgroundColor = color1;
+    laser2.style.backgroundColor = color2;
+    text1.style.borderColor = color1;
+    text2.style.borderColor = color2;
 
     let laserEff1 = closestVal(laserWave1) * Number(power1.value);
     let laserEff2 = closestVal(laserWave2) * Number(power2.value);

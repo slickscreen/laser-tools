@@ -5,11 +5,12 @@
 
 header {
     text-align: center;
-    background-color: rgb(70, 70, 70);
+    background-color: rgb(47, 56, 56);
     color: white;
     margin: 0;
     padding: 5px;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 500;
 }
 
 body {
@@ -20,7 +21,7 @@ body {
 h1 {
     display: inline;
     font-size: 1rem;
-    margin: 5px 0px 5px 5px;
+    margin: 5px 5px 5px 5px;
 }
 
 label {
@@ -51,26 +52,33 @@ label {
     overflow: hidden;
 }
 
-p {
+.laser-display {
+    position: relative;
+}
+
+.laser-display>p {
     display: inline-block;
     position: absolute;
     bottom: 5px;
     text-shadow: 0px 0px 5px white;
+    right: calc(50% - (75px / 2) - 3px);
+    border: 1px lightgray solid;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.781);
+    padding: 2px;
 }
 
 input {
-    width: 100px;
+    width: 75px;
     margin: 5px 0px;
 }
 
-.laser-display {
-    position: relative;
-    text-align: center;
-}
-
-body>input, body>label {
+body>div>input,
+body>div>label {
     width: auto;
     text-align: center;
+    align-self: center;
+    vertical-align: middle;
 }
 
 .outer-display {
@@ -78,4 +86,5 @@ body>input, body>label {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    background: linear-gradient(to top, white, rgb(215, 223, 230));
 }
