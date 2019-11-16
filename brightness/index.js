@@ -18,20 +18,159 @@ power2.onchange = onChange;
 const text1 = document.getElementById("text1");
 const text2 = document.getElementById("text2");
 
-const beamCheck = document.getElementById("beam-box");
-beamCheck.onclick = (e) => {
-    // console.log(e.target.checked);
+const mesopCheck = document.getElementById("mesopic-box");
+mesopCheck.onclick = (e) => {
+    // autoSetup();
     updateVals();
 }
 
-function closestVal(wavelength) {
+const beamCheck = document.getElementById("beam-box");
+beamCheck.onclick = (e) => {
+    // console.log(e.target.checked);
+    autoSetup();
+    updateVals();
+}
+
+const autoCalc = document.getElementById("auto-box");
+autoCalc.onclick = (e) => {
+    // console.log(e.target.checked);
+    autoSetup();
+    updateVals();
+}
+
+function lerp(val1, val2, ratio) {
+    const boundedRatio = Math.min(1, Math.max(0, ratio));
+    return (1 - boundedRatio) * val1 + boundedRatio * val2;
+}
+
+function boundedRatio(min, max, val) {
+    if (max === min)
+        return 0;
+    const ratio = (val - min) / (max - min);
+    return Math.min(1, Math.max(0, ratio));
+}
+
+const constants = {
+    photopicLum: 613,
+    scotopicLum: 1700,
+    mesopEnd: closestVal(photopTable, 532) * 350,
+    mesopBlueSteps: {
+        '0': 0.13,
+        '0.01': 0.42,
+        '0.1': 0.70,
+        '0.98': 0.98,
+        '1': 1.00
+    },
+    mesopRedSteps: {
+        '0': 0.00,
+        '0.01': 0.34,
+        '0.1': 0.68,
+        '0.98': 0.98,
+        '1': 1
+    },
+    mesopBlueWave: 440,
+    mesopRedWave: 650,
+    getWeight: function (stepTable, ratio) {
+        let minVal = 0, maxVal = 0;
+        const sortedKeys = Object.keys(stepTable).sort((a, b) => Number(a) - Number(b));
+        let lastKey = sortedKeys[0];
+        let startKey = sortedKeys[0];
+        let endKey = sortedKeys[0];
+        for (let i = 0; i < sortedKeys.length; i++) {
+            if (ratio >= Number(lastKey) && ratio <= Number(sortedKeys[i])) {
+                minVal = stepTable[lastKey];
+                maxVal = stepTable[sortedKeys[i]];
+                endKey = sortedKeys[i];
+                break;
+            } else
+                lastKey = sortedKeys[i];
+        }
+        const newRatio = boundedRatio(Number(lastKey), Number(endKey), ratio);
+        // console.log(lerp(minVal, maxVal, newRatio), minVal, maxVal, lastKey, endKey, ratio, newRatio)
+
+        return lerp(minVal, maxVal, newRatio);
+    },
+    getRBWeight: function (wavelength, ratio) {
+        const rgRatio = boundedRatio(this.mesopBlueWave, this.mesopRedWave, wavelength);
+        return lerp(this.getWeight(this.mesopBlueSteps, ratio), this.getWeight(this.mesopRedSteps, ratio), rgRatio);
+    },
+    getMesopWeight: function (wavelength, power) {
+        const brightness = closestVal(photopTable, wavelength) * power;
+        const ratio = boundedRatio(1, this.mesopEnd, brightness);
+        return this.getRBWeight(wavelength, ratio);
+    }
+}
+
+function closestVal(table, wavelength) {
     let closest = null;
-    for (const key in lumenTable) {
+    for (const key in table) {
         if (!closest || Math.abs(wavelength - Number(key)) < Math.abs(wavelength - closest))
             closest = Number(key);
     }
 
-    return closest ? lumenTable[closest] : 0;
+    return closest ? table[closest] : 0;
+}
+
+function autoSetup() {
+    if (autoCalc.checked)
+        power2.setAttribute('disabled', '')
+    else {
+        power2.removeAttribute('disabled')
+        power2.value = Math.round(power2.value);
+    }
+
+    if (!beamCheck.checked)
+        mesopCheck.setAttribute('disabled', '')
+    else
+        mesopCheck.removeAttribute('disabled');
+}
+
+function calcBrightness(wavelength, mw) {
+    let brightness = closestVal(photopTable, wavelength) * Number(mw);
+
+    if (beamCheck.checked) {
+        brightness /= Math.pow(wavelength, 4);
+    }
+
+    if (beamCheck.checked && mesopCheck.checked) {
+        const photop = closestVal(photopTable, wavelength) * Number(mw) * constants.photopicLum;
+        const scotop = closestVal(scotopTable, wavelength) * Number(mw) * constants.scotopicLum;
+        const weight = constants.getMesopWeight(wavelength, Number(mw));
+        // console.log(wavelength, closestVal(photopTable, wavelength), closestVal(scotopTable, wavelength), weight)
+        brightness = lerp(scotop, photop, weight);
+        brightness /= Math.pow(wavelength, 4)
+    }
+
+    return brightness;
+}
+
+function matchBrightness(brightness, wavelength) {
+    const higherBright = brightness * Math.pow(wavelength, 4);
+    const factor = (mesopCheck.checked) ? 1 / 100 : 10;
+    let out = higherBright * factor / 10;
+
+    // console.log(out, higherBright)
+    for (let attempts = 0, lastDiff = 0, overShootProtection = 1; attempts < 100; attempts++) {
+        const newBright = calcBrightness(wavelength, out) * Math.pow(wavelength, 4);
+        const newDiff = higherBright - newBright;
+
+        if (out < 0)
+            out = 0;
+        if (attempts > 0 && (newDiff >= 0) !== (lastDiff >= 0)) {
+            if (Math.abs(newDiff) > Math.abs(lastDiff))
+                overShootProtection *= Math.abs(lastDiff) / Math.abs(newDiff);
+            overShootProtection /= 4;
+        }
+        out += newDiff * overShootProtection * factor;
+
+        lastDiff = newDiff;
+        lastOut = out;
+        // console.log(out, newDiff, overShootProtection, attempts)
+
+        if (Math.abs(newDiff) < (1 / factor) / 90)
+            break;
+    }
+    return out;
 }
 
 function updateVals() {
@@ -45,12 +184,23 @@ function updateVals() {
     text1.style.borderColor = color1;
     text2.style.borderColor = color2;
 
-    let laserEff1 = closestVal(laserWave1) * Number(power1.value);
-    let laserEff2 = closestVal(laserWave2) * Number(power2.value);
+    // let laserEff1 = closestVal(photopTable, laserWave1) * Number(power1.value);
+    let laserEff1 = calcBrightness(laserWave1, power1.value)
+    // if (beamCheck.checked)
+    //     laserEff1 *= Math.pow(laserWave2 / laserWave1, 4);
 
-    if (beamCheck.checked)
-        laserEff1 *= Math.pow(laserWave2 / laserWave1, 4);
+    if (autoCalc.checked) {
+        // power2.value = Math.round(laserEff1 / closestVal(photopTable, laserWave2));
+        if (beamCheck.checked)
+            power2.value = matchBrightness(laserEff1, laserWave2);
+        else
+            power2.value = laserEff1 / closestVal(photopTable, laserWave2);
+        // console.log(laserEff1, laserWave2)
+    }
 
+    // let laserEff2 = closestVal(photopTable, laserWave2) * Number(power2.value);
+    let laserEff2 = calcBrightness(laserWave2, power2.value);
+    // console.log(calcBrightness(laserWave1, power1.value), calcBrightness(laserWave2, power2.value), laserEff1/ laserEff2, power2.value, power1.value, laserWave2, laserWave1)
     const largest = Math.max(laserEff1, laserEff2);
 
     const ratio1 = laserEff1 / largest;
@@ -65,6 +215,7 @@ function updateVals() {
 }
 
 function onChange(e) {
+    autoSetup();
     updateVals();
 }
 
@@ -131,4 +282,5 @@ function wavelengthToColor(wavelength) {
     return colorSpace;
 }
 
+autoSetup();
 updateVals();

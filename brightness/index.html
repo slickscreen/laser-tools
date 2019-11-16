@@ -41,9 +41,20 @@
             </div>
         </div>
     </div>
-    <div>
-        <input type="checkbox" name="beambox" id="beam-box">
-        <label for="beam-box">Beam brightness</label>
+    <div class="settings-container">
+        <div class="settings-input">
+            <input type="checkbox" name="autobox" id="auto-box">
+            <label for="auto-box">Auto Calc</label>
+        </div>
+        <div class="settings-input">
+            <input type="checkbox" name="beambox" id="beam-box">
+            <label for="beam-box">Beam brightness</label>
+        </div>
+        <div class="break"></div>
+        <div class="settings-input settings-mesopic">
+            <input type="checkbox" name="mesopicbox" id="mesopic-box">
+            <label for="mesopic-box">Mesopic Correction (Experimental)</label>
+        </div>
     </div>
     <script src="./constants.js"></script>
     <script src="./index.js"></script>
